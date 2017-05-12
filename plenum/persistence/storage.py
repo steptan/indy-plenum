@@ -8,6 +8,7 @@ from plenum.common.types import Reply
 from state.kv.kv_in_memory import KeyValueStorageInMemory
 from state.kv.kv_store import KeyValueStorage
 from state.kv.kv_store_leveldb import KeyValueStorageLeveldb
+from state.kv.kv_store_rocksdb import KeyValueStorageRocksdb
 
 
 class Storage(ABC):
@@ -34,6 +35,9 @@ def initKeyValueStorage(keyValueType, dataLocation, keyValueStorageName) -> KeyV
         return KeyValueStorageLeveldb(kvPath)
     elif keyValueType == KeyValueStorageType.Memory:
         return KeyValueStorageInMemory()
+    elif keyValueType == KeyValueStorageType.Rocksdb:
+        kvPath = os.path.join(dataLocation, keyValueStorageName)
+        return KeyValueStorageRocksdb(kvPath)
     else:
         raise KeyValueStorageConfigNotFound
 

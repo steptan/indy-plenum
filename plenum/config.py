@@ -48,9 +48,9 @@ hashStore = {
 
 primaryStorage = None
 
-domainStateStorage = KeyValueStorageType.Leveldb
-poolStateStorage = KeyValueStorageType.Leveldb
-reqIdToTxnStorage = KeyValueStorageType.Leveldb
+domainStateStorage = KeyValueStorageType.Rocksdb
+poolStateStorage = KeyValueStorageType.Rocksdb
+reqIdToTxnStorage = KeyValueStorageType.Rocksdb
 
 DefaultPluginPath = {
     # PLUGIN_BASE_DIR_PATH: "<abs path of plugin directory can be given here,

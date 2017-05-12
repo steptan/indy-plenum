@@ -23,7 +23,7 @@ from plenum.common.constants import TXN_TYPE, TXN_TIME, POOL_TXN_TYPES, \
     TARGET_NYM, ROLE, STEWARD, NYM, VERKEY, OP_FIELD_NAME, CLIENT_STACK_SUFFIX, \
     CLIENT_BLACKLISTER_SUFFIX, NODE_BLACKLISTER_SUFFIX, \
     NODE_PRIMARY_STORAGE_SUFFIX, NODE_HASH_STORE_SUFFIX, HS_FILE, DATA, ALIAS, \
-    NODE_IP, HS_LEVELDB, POOL_LEDGER_ID, DOMAIN_LEDGER_ID
+    NODE_IP, HS_LEVELDB, POOL_LEDGER_ID, DOMAIN_LEDGER_ID, HS_ROCKSDB
 from plenum.common.exceptions import SuspiciousNode, SuspiciousClient, \
     MissingNodeOp, InvalidNodeOp, InvalidNodeMsg, InvalidClientMsgType, \
     InvalidClientOp, InvalidClientRequest, BaseExc, \
@@ -53,6 +53,7 @@ from plenum.common.types import Propagate, \
 from plenum.common.util import friendlyEx, getMaxFailures
 from plenum.common.verifier import DidVerifier
 from plenum.persistence.leveldb_hash_store import LevelDbHashStore
+from plenum.persistence.rocksdb_hash_store import RocksDbHashStore
 from plenum.persistence.req_id_to_txn import ReqIdrToTxn
 
 from plenum.persistence.storage import Storage, initStorage, initKeyValueStorage
@@ -470,6 +471,8 @@ class Node(HasActionQueue, Motor, Propagator, MessageProcessor, HasFileStorage,
                                  fileNamePrefix=NODE_HASH_STORE_SUFFIX)
         elif hsConfig == HS_LEVELDB:
             return LevelDbHashStore(dataDir=self.dataLocation)
+        elif hsConfig == HS_ROCKSDB:
+            return RocksDbHashStore(dataDir=self.dataLocation)
         else:
             return MemoryHashStore()
 
@@ -579,7 +582,7 @@ class Node(HasActionQueue, Motor, Propagator, MessageProcessor, HasFileStorage,
         if isinstance(self.poolManager, TxnPoolManager) and self.poolManager.hashStore:
             hashStores.append(self.poolManager.hashStore)
         hashStores = [hs for hs in hashStores if
-                      isinstance(hs, (FileHashStore, LevelDbHashStore))
+                      isinstance(hs, (FileHashStore, LevelDbHashStore, RocksDbHashStore))
                       and not hs.closed]
         for hs in hashStores:
             try:
@@ -601,7 +604,7 @@ class Node(HasActionQueue, Motor, Propagator, MessageProcessor, HasFileStorage,
                                           LedgerState.not_synced)
 
     def closeAllKVStores(self):
-        # Clear leveldb lock files
+        # Clear leveldb/rocksdb lock files
         logger.info("{} closing level dbs".format(self), extra={"cli": False})
         for ledgerId in self.ledgerManager.ledgerRegistry:
             state = self.getState(ledgerId)
