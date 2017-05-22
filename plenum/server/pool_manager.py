@@ -1,3 +1,5 @@
+import ipaddress
+
 import os
 import base58
 from typing import Dict, Tuple
@@ -71,6 +73,12 @@ class TxnPoolManager(PoolManager, TxnStackManager):
         self.nstack, self.cstack, self.nodeReg, self.cliNodeReg = \
             self.getStackParamsAndNodeReg(self.name, self.basedirpath, ha=ha,
                                           cliname=cliname, cliha=cliha)
+        self._dataFieldsValidators = (
+            (NODE_IP, self._isIpAddressValid),
+            (CLIENT_IP, self._isIpAddressValid),
+            (NODE_PORT, self._isPortValid),
+            (CLIENT_PORT, self._isPortValid),
+        )
 
     def __repr__(self):
         return self.node.name
@@ -279,6 +287,12 @@ class TxnPoolManager(PoolManager, TxnStackManager):
                 error = "'{}' is not a base58 string".format(TARGET_NYM)
                 raise InvalidClientRequest(identifier, reqId, error)
 
+            data = operation[DATA]
+            for fn, validator in self._dataFieldsValidators:
+                if fn in data and not validator(data[fn]):
+                    error = "'{}' ('{}') is invalid".format(fn, data[fn])
+                    raise InvalidClientRequest(identifier, reqId, error)
+
     def doDynamicValidation(self, request: Request):
         self.reqHandler.validate(request)
 
@@ -296,6 +310,19 @@ class TxnPoolManager(PoolManager, TxnStackManager):
     def getNodeData(self, nym):
         _, nodeTxn = self.getNodeInfoFromLedger(nym)
         return nodeTxn[DATA]
+
+    @staticmethod
+    def _isIpAddressValid(ipAddress):
+        try:
+            ipaddress.ip_address(ipAddress)
+        except ValueError:
+            return False
+        else:
+            return ipAddress != '0.0.0.0'
+
+    @staticmethod
+    def _isPortValid(port):
+        return isinstance(port, int) and 0 < port <= 65535
 
 
 class RegistryPoolManager(PoolManager):

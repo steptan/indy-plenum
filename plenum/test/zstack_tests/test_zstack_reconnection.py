@@ -29,6 +29,7 @@ def checkNodesSendingCommits(nodeSet):
                     assert otherReplica.name in senders
 
 
+@pytest.mark.skip(reason='SOV-1020')
 def testZStackNodeReconnection(tconf, looper, txnPoolNodeSet, client1, wallet1,
                                tdirWithPoolTxns, client1Connected):
     sendReqsToNodesAndVerifySuffReplies(looper, wallet1, client1, 1)

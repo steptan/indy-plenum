@@ -4,7 +4,8 @@ from typing import Iterable
 from plenum.common.constants import POOL_LEDGER_ID, DOMAIN_LEDGER_ID
 from stp_core.loop.eventually import eventually
 from stp_core.types import HA
-from plenum.test.helper import checkLedgerEquality, checkStateEquality
+from plenum.test.helper import checkLedgerEquality, checkStateEquality, \
+    check_seqno_db_equality, assertEquality
 from plenum.test.test_client import TestClient
 from plenum.test.test_node import TestNode
 from plenum.test import waits
@@ -19,6 +20,7 @@ def checkNodeDataForEquality(node: TestNode,
                              *otherNodes: Iterable[TestNode]):
     # Checks for node's ledgers and state's to be equal
     for n in otherNodes:
+        check_seqno_db_equality(node.seqNoDB, n.seqNoDB)
         checkLedgerEquality(node.domainLedger, n.domainLedger)
         checkStateEquality(node.getState(DOMAIN_LEDGER_ID), n.getState(DOMAIN_LEDGER_ID))
         if n.poolLedger:
@@ -65,3 +67,8 @@ def ensureClientConnectedToNodesAndPoolLedgerSame(looper,
                           client,
                           *nodes,
                           timeout=timeout))
+
+
+def check_ledger_state(node, ledger_id, ledger_state):
+    assertEquality(node.ledgerManager.getLedgerInfoByType(ledger_id).state,
+                   ledger_state)

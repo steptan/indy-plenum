@@ -1,3 +1,5 @@
+import pytest
+
 from plenum.test.test_node import ensureElectionsDone, \
     primaryNodeNameForInstance, nodeByName, get_master_primary_node, \
     ensure_node_disconnected
@@ -9,6 +11,7 @@ from plenum.test.helper import stopNodes, checkViewNoForNodes, \
     sendReqsToNodesAndVerifySuffReplies
 
 
+@pytest.mark.skip(reason='SOV-1020')
 def testViewChangesIfMasterPrimaryDisconnected(txnPoolNodeSet,
                                                looper, wallet1, client1,
                                                client1Connected, tconf):

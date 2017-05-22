@@ -1,5 +1,5 @@
 # inter-node communication
-from enum import IntEnum
+from enum import IntEnum, unique
 
 from plenum.common.roles import Roles
 from plenum.common.transactions import PlenumTransactions
@@ -101,10 +101,19 @@ class StorageType(IntEnum):
     File = 1
     Ledger = 2
 
+
 class KeyValueStorageType(IntEnum):
     Leveldb = 1
     Memory = 2
     Rocksdb = 3
+
+
+@unique
+class LedgerState(IntEnum):
+    not_synced = 1  # Still gathering consistency proofs
+    syncing = 2     # Got sufficient consistency proofs, will be sending catchup requests and waiting for their replies
+    synced = 3      # Got replies for all catchup requests, indicating catchup complete for the ledger
+
 
 OP_FIELD_NAME = "op"
 

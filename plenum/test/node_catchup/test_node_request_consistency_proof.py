@@ -1,9 +1,9 @@
-import base64
 import types
 from random import randint
 
 import pytest
 
+from plenum.common.ledger import Ledger
 from stp_core.loop.eventually import eventually
 from stp_core.common.log import getlogger
 from plenum.common.types import LedgerStatus
@@ -46,8 +46,8 @@ def testNodeRequestingConsProof(txnPoolNodeSet, nodeCreatedAfterSomeTxns):
         while newSize in sentSizes:
             newSize = randint(1, size)
         print("new size {}".format(newSize))
-        newRootHash = base64.b64encode(
-            self.domainLedger.tree.merkle_tree_hash(0, newSize)).decode()
+        newRootHash = Ledger.hashToStr(
+            self.domainLedger.tree.merkle_tree_hash(0, newSize))
         ledgerStatus = LedgerStatus(1, newSize,
                                     newRootHash)
 
@@ -70,6 +70,7 @@ def testNodeRequestingConsProof(txnPoolNodeSet, nodeCreatedAfterSomeTxns):
     waitNodeDataEquality(looper, newNode, *txnPoolNodeSet[:-1],
                          customTimeout=75)
 
+    # Other nodes should have received a `ConsProofRequest` and processed it.
     for node in txnPoolNodeSet[:-1]:
         assert node.ledgerManager.spylog.count(
             TestLedgerManager.processConsistencyProofReq.__name__) > 0
