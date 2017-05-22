@@ -38,7 +38,7 @@ if not os.path.exists(BASE_DIR):
     os.makedirs(BASE_DIR)
 
 setup(
-    name='plenum-3pc-batch',
+    name='plenum-3pc-batch-rocksdb',
     version=__version__,
     description='Plenum Byzantine Fault Tolerant Protocol',
     long_description='Plenum Byzantine Fault Tolerant Protocol',
@@ -59,7 +59,7 @@ setup(
         (BASE_DIR, ['data/pool_transactions_sandbox', ])
     )],
     install_requires=['ledger-3pc-batch==0.2.16', 'stp-3pc-batch==0.1.15',
-                      'state-trie==0.1.14', 'jsonpickle',
+                      'evernym-state-rocksdb', 'jsonpickle',
                       'prompt_toolkit==0.57', 'pygments',
                       'ioflo==1.5.4', 'semver', 'base58', 'orderedset',
                       'sortedcontainers==1.5.7', 'psutil', 'pip'],
