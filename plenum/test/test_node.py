@@ -25,7 +25,7 @@ from stp_core.loop.looper import Looper
 from plenum.common.startable import Status
 from plenum.common.types import NodeDetail, f
 from plenum.common.constants import CLIENT_STACK_SUFFIX, TXN_TYPE, \
-    DOMAIN_LEDGER_ID, NYM, STATE_PROOF
+    DOMAIN_LEDGER_ID, TXN_TIME
 from plenum.common.util import Seconds, getMaxFailures
 from stp_core.common.util import adict
 from plenum.server import replica
@@ -59,7 +59,13 @@ class TestDomainRequestHandler(DomainRequestHandler):
     def prepare_buy_for_state(txn):
         from common.serializers.serialization import domain_state_serializer
         identifier = txn.get(f.IDENTIFIER.nm)
-        value = domain_state_serializer.serialize(txn)
+        txn_value = {TXN_TYPE: txn[TXN_TYPE],
+                     "amount": txn["amount"],
+                     f.IDENTIFIER.nm: txn[f.IDENTIFIER.nm],
+                     f.REQ_ID.nm: txn[f.REQ_ID.nm],
+                     f.SEQ_NO.nm: txn[f.SEQ_NO.nm],
+                     TXN_TIME: txn[TXN_TIME]}
+        value = domain_state_serializer.serialize(txn_value)
         key = TestDomainRequestHandler.prepare_buy_key(identifier)
         return key, value
 

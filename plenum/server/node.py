@@ -2408,9 +2408,11 @@ class Node(HasActionQueue, Motor, Propagator, MessageProcessor, HasFileStorage,
 
     def send_replies_to_clients(self, reqHandler, txns, reqs: List[Request], pp_time):
         for txn, req in zip_longest(txns, reqs, fillvalue=None):
+            path = reqHandler.get_path_for_txn(txn)
+            proof = reqHandler.make_proof(path) if path else None
             result = reqHandler.make_write_result(request=req,
-                                             txn=txn,
-                                             txn_time=pp_time)
+                                                  txn=txn,
+                                                  proof=proof)
             self.sendReplyToClient(Reply(result),
                                    (txn[f.IDENTIFIER.nm],
                                     txn[f.REQ_ID.nm]))

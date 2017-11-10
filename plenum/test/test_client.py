@@ -11,7 +11,7 @@ from plenum.client.client import Client, ClientProvider
 from plenum.client.wallet import Wallet
 from plenum.common.error import error
 from stp_core.common.log import getlogger
-from plenum.common.constants import REQACK, REQNACK, REPLY, TXN_TYPE
+from plenum.common.constants import REQACK, REQNACK, REPLY, TXN_TYPE, DATA
 from plenum.common.types import f
 from plenum.common.util import bootstrapClientKeys
 from plenum.test.test_stack import StackedTester, getTestableStack
@@ -41,9 +41,12 @@ class TestClient(Client, StackedTester):
         super().handleOneNodeMsg(wrappedMsg, excludeFromCli=excludeFromCli)
 
     def prepare_for_state(self, result):
+        from plenum.test.test_node import TestDomainRequestHandler
         if result[TXN_TYPE] == "buy":
-            from plenum.test.test_node import TestDomainRequestHandler
             key, value = TestDomainRequestHandler.prepare_buy_for_state(result)
+            return key, value
+        if result[TXN_TYPE] == "get_buy":
+            key, value = TestDomainRequestHandler.prepare_buy_for_state(result[DATA])
             return key, value
 
 def genTestClient(nodes=None,

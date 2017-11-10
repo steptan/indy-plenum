@@ -105,12 +105,8 @@ class RequestHandler(metaclass=ABCMeta):
             PROOF_NODES: encoded_proof
         }
 
-    # TODO: we can probably remove txn_time from here as txn_time is embedded into every transaction
-    def make_write_result(self, request, txn, txn_time):
+    def make_write_result(self, request, txn, proof):
         result = txn
-
-        path = self.get_path_for_txn(txn)
-        proof = self.make_proof(path) if path else None
 
         if proof and request and request.protocolVersion and \
                         request.protocolVersion >= PlenumProtocolVersion.STATE_PROOF_SUPPORT.value:
