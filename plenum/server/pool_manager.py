@@ -1,18 +1,14 @@
 import ipaddress
-
 from abc import abstractmethod
 from collections import OrderedDict
-
-from typing import Optional
-
 from copy import deepcopy
 from typing import Dict, Tuple, List
+from typing import Optional
 
 from plenum.common.constants import TXN_TYPE, NODE, TARGET_NYM, DATA, ALIAS, \
     NODE_IP, NODE_PORT, CLIENT_IP, CLIENT_PORT, VERKEY, SERVICES, \
     VALIDATOR, CLIENT_STACK_SUFFIX, POOL_LEDGER_ID, DOMAIN_LEDGER_ID, BLS_KEY
-from plenum.common.exceptions import UnsupportedOperation, \
-    InvalidClientRequest
+from plenum.common.exceptions import UnsupportedOperation
 from plenum.common.request import Request
 from plenum.common.stack_manager import TxnStackManager
 from plenum.common.types import NodeDetail
@@ -206,13 +202,15 @@ class TxnPoolManager(PoolManager, TxnStackManager):
         """
         committedTxns = self.reqHandler.commit(len(reqs), stateRoot, txnRoot)
         self.node.updateSeqNoMap(committedTxns)
+
         for txn in committedTxns:
             t = deepcopy(txn)
             # Since the committed transactions contain merkle info,
             # try to avoid this kind of strictness
             pop_merkle_info(t)
             self.onPoolMembershipChange(t)
-        self.node.sendRepliesToClients(committedTxns, ppTime)
+
+        self.node.send_replies_to_clients(self.reqHandler, committedTxns, reqs, ppTime)
         return committedTxns
 
     def onPoolMembershipChange(self, txn):
@@ -279,7 +277,7 @@ class TxnPoolManager(PoolManager, TxnStackManager):
             rid = self.stackHaChanged(txn, nodeName, self.node)
             if rid:
                 self.node.nodestack.outBoxes.pop(rid, None)
-            # self.node.sendPoolInfoToClients(txn)
+                # self.node.sendPoolInfoToClients(txn)
         self.node_about_to_be_disconnected(nodeName)
 
     def nodeKeysChanged(self, txn):
@@ -301,7 +299,7 @@ class TxnPoolManager(PoolManager, TxnStackManager):
             rid = self.stackKeysChanged(txn, nodeName, self.node)
             if rid:
                 self.node.nodestack.outBoxes.pop(rid, None)
-            # self.node.sendPoolInfoToClients(txn)
+                # self.node.sendPoolInfoToClients(txn)
         self.node_about_to_be_disconnected(nodeName)
 
     def nodeServicesChanged(self, txn):
@@ -406,7 +404,7 @@ class TxnPoolManager(PoolManager, TxnStackManager):
 
         if curName is None:
             logger.info("{} node {} ordered, NYM {}".format(
-                        self.name, nodeName, nodeNym))
+                self.name, nodeName, nodeNym))
             self._ordered_node_ids[nodeNym] = nodeName
         elif curName != nodeName:
             msg = ("{} is trying to order already ordered node {} ({}) "

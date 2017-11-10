@@ -20,8 +20,8 @@ def test_make_proof_bls_disabled(looper, txnPoolNodeSet,
         assert not proof
 
 
-def test_make_result_bls_disabled(looper, txnPoolNodeSet,
-                                  client1, client1Connected, wallet1):
+def test_make_read_result_bls_disabled(looper, txnPoolNodeSet,
+                                       client1, client1Connected, wallet1):
     reqs = sendRandomRequests(wallet1, client1, 1)
     waitForSufficientRepliesForRequests(looper, client1, requests=reqs)
 
@@ -29,9 +29,22 @@ def test_make_result_bls_disabled(looper, txnPoolNodeSet,
     for node in txnPoolNodeSet:
         key = node.reqHandler.prepare_buy_key(req.identifier)
         proof = node.reqHandler.make_proof(key)
-        result = node.reqHandler.make_result(req,
-                                             {TXN_TYPE: "buy"},
-                                             2,
-                                             get_utc_epoch(),
-                                             proof)
+        result = node.reqHandler.make_read_result(req,
+                                                  {TXN_TYPE: "buy"},
+                                                  2,
+                                                  get_utc_epoch(),
+                                                  proof)
+        assert STATE_PROOF not in result
+
+
+def test_make_write_result_bls_disabled(looper, txnPoolNodeSet,
+                                        client1, client1Connected, wallet1):
+    reqs = sendRandomRequests(wallet1, client1, 1)
+    waitForSufficientRepliesForRequests(looper, client1, requests=reqs)
+
+    req = reqs[0]
+    for node in txnPoolNodeSet:
+        result = node.reqHandler.make_write_result(req,
+                                                   {TXN_TYPE: "buy"},
+                                                   get_utc_epoch())
         assert STATE_PROOF not in result

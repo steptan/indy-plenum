@@ -18,10 +18,9 @@ logger = getlogger()
 
 
 class PoolRequestHandler(RequestHandler):
-
     def __init__(self, ledger: Ledger, state: State,
                  domainState: State):
-        super().__init__(ledger, state)
+        super().__init__(ledger, state, bls_store=None)
         self.domainState = domainState
         self.stateSerializer = pool_state_serializer
 
@@ -185,7 +184,7 @@ class PoolRequestHandler(RequestHandler):
                          (None, (None, None))))
 
                 if (not nodeData and len(bag) != 3) or (
-                        nodeData and len(bag) != 6):
+                            nodeData and len(bag) != 6):
                     return True
 
     def dataErrorWhileValidatingUpdate(self, data, nodeNym):
@@ -199,3 +198,10 @@ class PoolRequestHandler(RequestHandler):
         if self.isNodeDataConflicting(data, nodeNym):
             return "existing data has conflicts with " \
                    "request data {}".format(data)
+
+    def get_path_for_txn(self, txn):
+        typ = txn.get(TXN_TYPE)
+        if typ == NODE:
+            nym = txn.get(TARGET_NYM)
+            return nym.encode()
+        return None

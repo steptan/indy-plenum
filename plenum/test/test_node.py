@@ -59,7 +59,7 @@ class TestDomainRequestHandler(DomainRequestHandler):
     def prepare_buy_for_state(txn):
         from common.serializers.serialization import domain_state_serializer
         identifier = txn.get(f.IDENTIFIER.nm)
-        value = domain_state_serializer.serialize({"amount": txn['amount']})
+        value = domain_state_serializer.serialize(txn)
         key = TestDomainRequestHandler.prepare_buy_key(identifier)
         return key, value
 
@@ -76,6 +76,13 @@ class TestDomainRequestHandler(DomainRequestHandler):
                          format(self, self.state.headHash))
         else:
             super()._updateStateWithSingleTxn(txn, isCommitted=isCommitted)
+
+    def get_path_for_txn(self, txn):
+        typ = txn.get(TXN_TYPE)
+        if typ == 'buy' or typ == 'get_buy':
+            identifier = txn.get(f.IDENTIFIER.nm)
+            return self.prepare_buy_key(identifier)
+        return super().get_path_for_txn(txn)
 
 NodeRef = TypeVar('NodeRef', Node, str)
 
@@ -357,15 +364,6 @@ class TestNode(TestNodeCore, Node):
             postAllLedgersCaughtUp=self.allLedgersCaughtUp,
             preCatchupClbk=self.preLedgerCatchUp)
 
-    def sendRepliesToClients(self, committedTxns, ppTime):
-        committedTxns = list(committedTxns)
-        for txn in committedTxns:
-            if txn[TXN_TYPE] == "buy":
-                key, value = self.reqHandler.prepare_buy_for_state(txn)
-                proof = self.reqHandler.make_proof(key)
-                if proof:
-                    txn[STATE_PROOF] = proof
-        super().sendRepliesToClients(committedTxns, ppTime)
 
 elector_spyables = [
     PrimaryElector.discard,

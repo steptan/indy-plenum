@@ -4,6 +4,7 @@ import time
 from binascii import unhexlify
 from collections import deque, defaultdict
 from contextlib import closing
+from itertools import zip_longest
 from typing import Dict, Any, Mapping, Iterable, List, Optional, Set, Tuple
 
 from crypto.bls.bls_key_manager import LoadBLSKeyError
@@ -73,6 +74,7 @@ from plenum.server.primary_selector import PrimarySelector
 from plenum.server.propagator import Propagator
 from plenum.server.quorums import Quorums
 from plenum.server.replicas import Replicas
+from plenum.server.req_handler import RequestHandler
 from plenum.server.router import Router
 from plenum.server.suspicion_codes import Suspicions
 from plenum.server.validator_info_tool import ValidatorNodeInfoTool
@@ -2401,10 +2403,17 @@ class Node(HasActionQueue, Motor, Propagator, MessageProcessor, HasFileStorage,
                              stateRoot, txnRoot) -> List:
         committedTxns = reqHandler.commit(len(reqs), stateRoot, txnRoot)
         self.updateSeqNoMap(committedTxns)
-        self.sendRepliesToClients(
-            map(self.update_txn_with_extra_data, committedTxns),
-            ppTime)
+        self.send_replies_to_clients(reqHandler, committedTxns, reqs, ppTime)
         return committedTxns
+
+    def send_replies_to_clients(self, reqHandler, txns, reqs: List[Request], pp_time):
+        for txn, req in zip_longest(txns, reqs, fillvalue=None):
+            result = reqHandler.make_write_result(request=req,
+                                             txn=txn,
+                                             txn_time=pp_time)
+            self.sendReplyToClient(Reply(result),
+                                   (txn[f.IDENTIFIER.nm],
+                                    txn[f.REQ_ID.nm]))
 
     def executeDomainTxns(self, ppTime, reqs: List[Request], stateRoot,
                           txnRoot) -> List:
@@ -2452,13 +2461,6 @@ class Node(HasActionQueue, Motor, Propagator, MessageProcessor, HasFileStorage,
     @classmethod
     def ledgerId(cls, txnType: str):
         return POOL_LEDGER_ID if txnType in POOL_TXN_TYPES else DOMAIN_LEDGER_ID
-
-    def sendRepliesToClients(self, committedTxns, ppTime):
-        for txn in committedTxns:
-            # TODO: Send txn and state proof to the client
-            txn[TXN_TIME] = ppTime
-            self.sendReplyToClient(Reply(txn), (txn[f.IDENTIFIER.nm],
-                                                txn[f.REQ_ID.nm]))
 
     def sendReplyToClient(self, reply, reqKey):
         if self.isProcessingReq(*reqKey):
