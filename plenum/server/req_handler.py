@@ -41,12 +41,12 @@ class RequestHandler(metaclass=ABCMeta):
         Applies request
         """
 
-    @abstractmethod
     def updateState(self, txns, isCommitted=False):
         """
         Updates current state with a number of committed or
         not committed transactions
         """
+        pass
 
     def commit(self, txnCount, stateRoot, txnRoot) -> List:
         """
@@ -106,7 +106,7 @@ class RequestHandler(metaclass=ABCMeta):
         }
 
     def make_write_result(self, request, txn, proof):
-        result = txn
+        result = {**txn}
 
         if proof and request and request.protocolVersion and \
                         request.protocolVersion >= PlenumProtocolVersion.STATE_PROOF_SUPPORT.value:
