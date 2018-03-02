@@ -21,7 +21,8 @@ class Gossipper:
             return
         limit = self.LIMIT if limit is None else limit
         temp_ids = copy(self.send_to)
-        temp_ids = random.shuffle(temp_ids)[:self.subset_size]
+        random.shuffle(temp_ids)
+        temp_ids = temp_ids[:self.subset_size]
         i = 0
         for msg in self.current_msgs[:limit]:
             self.sendToNodes(msg, temp_ids)

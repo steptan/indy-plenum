@@ -1325,7 +1325,8 @@ class Node(HasActionQueue, Motor, Propagator, MessageProcessor, HasFileStorage,
             num_processed += 1
             if isinstance(message, Gossip):
                 self.queue_for_gossip(message)
-            if isinstance(message, (PrePrepare, Prepare, Commit, Checkpoint)):
+                logger.debug('{} queued for gossip {}'.format(self, message))
+            elif isinstance(message, (PrePrepare, Prepare, Commit, Checkpoint)):
                 self.send(message)
             elif isinstance(message, Ordered):
                 self.try_processing_ordered(message)
