@@ -8,21 +8,21 @@ from plenum.test.propagate.helper import recvdRequest, recvdPropagate, \
     sentPropagate
 from plenum.test.test_node import TNode
 
-nodeCount = 4
+nodeCount = 6
 howlong = 5
 
 
 @pytest.fixture()
 def setup(nodeSet):
-    A, B, C, D = nodeSet.nodes.values()  # type: TNode
-    delay(Propagate, frm=[B, C, D], to=A, howlong=howlong)
+    A, B, C, D, E, F = nodeSet.nodes.values()  # type: TNode
+    delay(Propagate, frm=[B, C, D, E, F], to=A, howlong=howlong)
     # Delay MessageRep by long simulating loss as if Propagate is missing, it
     # is requested
     A.nodeIbStasher.delay(msg_rep_delay(10*howlong, [PROPAGATE, ]))
 
 
 def testPropagateRecvdAfterRequest(setup, looper, nodeSet, up, sent1):
-    A, B, C, D = nodeSet.nodes.values()  # type: TNode
+    A, B, C, D, E, F = nodeSet.nodes.values()  # type: TNode
 
     def x():
         # A should have received a request from the client
@@ -37,11 +37,11 @@ def testPropagateRecvdAfterRequest(setup, looper, nodeSet, up, sent1):
 
     def y():
         # A should have received 3 PROPAGATEs
-        assert len(recvdPropagate(A)) == 3
+        assert len(recvdPropagate(A)) == 5
         # A should have total of 4 PROPAGATEs (3 from other nodes and 1 from
         # itself)
         key = sent1.identifier, sent1.reqId
-        assert len(A.requests[key].propagates) == 4
+        assert len(A.requests[key].propagates) == 6
         # A should still have sent only one PROPAGATE
         assert len(sentPropagate(A)) == 1
 
