@@ -10,7 +10,7 @@ from plenum.common.util import randomString
 from plenum.test.node_catchup.helper import waitNodeDataEquality, \
     ensureClientConnectedToNodesAndPoolLedgerSame
 from plenum.test.pool_transactions.helper import changeNodeKeys
-from plenum.test.test_node import TestNode, checkNodesConnected
+from plenum.test.test_node import TNode, checkNodesConnected
 from plenum.common.config_helper import PNodeConfigHelper
 from stp_core.common.log import getlogger
 from stp_core.types import HA
@@ -45,10 +45,10 @@ def testNodeKeysChanged(looper, txnPoolNodeSet, tdir,
 
     logger.debug("{} starting with HAs {} {}".format(newNode, nodeHa, nodeCHa))
 
-    node = TestNode(newNode.name,
-                    config_helper=config_helper,
-                    config=tconf,
-                    ha=nodeHa, cliha=nodeCHa, pluginPaths=allPluginsPath)
+    node = TNode(newNode.name,
+                 config_helper=config_helper,
+                 config=tconf,
+                 ha=nodeHa, cliha=nodeCHa, pluginPaths=allPluginsPath)
     looper.add(node)
     # The last element of `txnPoolNodeSet` is the node Theta that was just
     # stopped

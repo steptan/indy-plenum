@@ -4,7 +4,7 @@ from plenum.test.node_catchup.helper import waitNodeDataEquality, \
     ensureClientConnectedToNodesAndPoolLedgerSame
 from plenum.test.pool_transactions.helper import updateNodeData, \
     buildPoolClientAndWallet
-from plenum.test.test_node import TestNode, checkNodesConnected
+from plenum.test.test_node import TNode, checkNodesConnected
 from stp_core.network.port_dispenser import genHa
 from plenum.common.config_helper import PNodeConfigHelper
 
@@ -46,19 +46,19 @@ def testChangeHaPersistsPostNodesRestart(looper, txnPoolNodeSet, tdir, tdirWithP
     restartedNodes = []
     for node in txnPoolNodeSet[:-1]:
         config_helper = PNodeConfigHelper(node.name, tconf, chroot=tdir)
-        restartedNode = TestNode(node.name,
-                                 config_helper=config_helper,
-                                 config=tconf, ha=node.nodestack.ha,
-                                 cliha=node.clientstack.ha)
+        restartedNode = TNode(node.name,
+                              config_helper=config_helper,
+                              config=tconf, ha=node.nodestack.ha,
+                              cliha=node.clientstack.ha)
         looper.add(restartedNode)
         restartedNodes.append(restartedNode)
 
     # Starting the node whose HA was changed
     config_helper = PNodeConfigHelper(newNode.name, tconf, chroot=tdir)
-    node = TestNode(newNode.name,
-                    config_helper=config_helper,
-                    config=tconf,
-                    ha=nodeNewHa, cliha=clientNewHa)
+    node = TNode(newNode.name,
+                 config_helper=config_helper,
+                 config=tconf,
+                 ha=nodeNewHa, cliha=clientNewHa)
     looper.add(node)
     restartedNodes.append(node)
 

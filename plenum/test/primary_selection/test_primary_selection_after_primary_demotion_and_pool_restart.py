@@ -4,7 +4,7 @@ from plenum.common.constants import ALIAS, SERVICES
 from plenum.test.pool_transactions.conftest import looper
 from plenum.test.pool_transactions.helper import updateNodeData
 
-from plenum.test.test_node import TestNode, checkNodesConnected, \
+from plenum.test.test_node import TNode, checkNodesConnected, \
     ensureElectionsDone
 from plenum.test.helper import checkViewNoForNodes, \
     sendReqsToNodesAndVerifySuffReplies
@@ -49,10 +49,10 @@ def test_primary_selection_after_primary_demotion_and_pool_restart(looper,
     restartedNodes = []
     for node in txnPoolNodeSet:
         config_helper = PNodeConfigHelper(node.name, tconf, chroot=tdir)
-        restartedNode = TestNode(node.name,
-                                 config_helper=config_helper,
-                                 config=tconf, ha=node.nodestack.ha,
-                                 cliha=node.clientstack.ha)
+        restartedNode = TNode(node.name,
+                              config_helper=config_helper,
+                              config=tconf, ha=node.nodestack.ha,
+                              cliha=node.clientstack.ha)
         looper.add(restartedNode)
         restartedNodes.append(restartedNode)
 

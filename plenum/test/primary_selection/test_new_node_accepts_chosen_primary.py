@@ -4,7 +4,7 @@ from stp_core.common.log import getlogger
 
 from plenum.test.helper import sendReqsToNodesAndVerifySuffReplies
 
-from plenum.test.test_node import TestNode, TestViewChanger
+from plenum.test.test_node import TNode, TestViewChanger
 from plenum.test.view_change.helper import ensure_view_change_complete
 
 from plenum.test.node_catchup.conftest import nodeCreatedAfterSomeTxns, \
@@ -29,14 +29,14 @@ class TestViewChangerWithAdjustedViewNo(TestViewChanger):
             self.__view_no = value
 
 
-class TestNodeWithAdjustedViewNo(TestNode):
+class TNodeWithAdjustedViewNo(TNode):
     def newViewChanger(self):
         return TestViewChangerWithAdjustedViewNo(self)
 
 
 @pytest.fixture(scope="module")
 def testNodeClass(patchPluginManager):
-    return TestNodeWithAdjustedViewNo
+    return TNodeWithAdjustedViewNo
 
 
 @pytest.fixture("module")

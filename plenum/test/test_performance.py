@@ -19,7 +19,7 @@ from plenum.test.node_catchup.helper import waitNodeDataEquality, \
     check_ledger_state
 from plenum.test.pool_transactions.helper import \
     disconnect_node_and_ensure_disconnected, buildPoolClientAndWallet
-from plenum.test.test_node import checkNodesConnected, TestNode
+from plenum.test.test_node import checkNodesConnected, TNode
 from plenum.test import waits
 
 # noinspection PyUnresolvedReferences
@@ -108,10 +108,10 @@ def test_node_load_consistent_time(tconf, change_checkpoint_freq,
     print_detailed_memory_usage = False
     from pympler import tracker
     tr = tracker.SummaryTracker()
-    node_methods_to_capture = [TestNode.executeBatch,
-                               TestNode.recordAndPropagate,
-                               TestNode.domainDynamicValidation,
-                               TestNode.domainRequestApplication]
+    node_methods_to_capture = [TNode.executeBatch,
+                               TNode.recordAndPropagate,
+                               TNode.domainDynamicValidation,
+                               TNode.domainRequestApplication]
     times = {n.name: {meth.__name__: [] for meth in node_methods_to_capture}
              for n in txnPoolNodeSet}
 
@@ -231,7 +231,7 @@ def test_node_load_after_add_then_disconnect(newNodeCaughtUp, txnPoolNodeSet,
     with capsys.disabled():
         print("Starting the stopped node, {}".format(new_node))
     nodeHa, nodeCHa = HA(*new_node.nodestack.ha), HA(*new_node.clientstack.ha)
-    new_node = TestNode(
+    new_node = TNode(
         new_node.name,
         basedirpath=tdirWithPoolTxns,
         base_data_dir=tdirWithPoolTxns,
@@ -303,8 +303,8 @@ def test_node_load_after_disconnect(looper, txnPoolNodeSet, tconf,
                   format(i + 1, txns_per_batch, perf_counter() - s))
 
     nodeHa, nodeCHa = HA(*x.nodestack.ha), HA(*x.clientstack.ha)
-    newNode = TestNode(x.name, basedirpath=tdirWithPoolTxns, base_data_dir=tdirWithPoolTxns, config=tconf,
-                       ha=nodeHa, cliha=nodeCHa, pluginPaths=allPluginsPath)
+    newNode = TNode(x.name, basedirpath=tdirWithPoolTxns, base_data_dir=tdirWithPoolTxns, config=tconf,
+                    ha=nodeHa, cliha=nodeCHa, pluginPaths=allPluginsPath)
     looper.add(newNode)
     txnPoolNodeSet[-1] = newNode
     looper.run(checkNodesConnected(txnPoolNodeSet))

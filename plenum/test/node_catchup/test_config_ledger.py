@@ -14,11 +14,11 @@ from plenum.test.helper import sdk_gen_request, sdk_sign_request_objects, \
 from plenum.common.constants import CONFIG_LEDGER_ID, DATA
 from plenum.test.test_config_req_handler import write_conf_op, \
     TestConfigReqHandler, WRITE_CONF, READ_CONF, read_conf_op
-from plenum.test.test_node import TestNode
+from plenum.test.test_node import TNode
 from stp_core.loop.eventually import eventually
 
 
-class NewTestNode(TestNode):
+class NewTNode(TNode):
     def getConfigReqHandler(self):
         return TestConfigReqHandler(self.configLedger,
                                     self.states[CONFIG_LEDGER_ID])
@@ -53,7 +53,7 @@ def send_some_config_txns(looper, sdk_pool_handle, sdk_wallet_client, keys):
 
 @pytest.fixture(scope="module")
 def testNodeClass(patchPluginManager):
-    return NewTestNode
+    return NewTNode
 
 
 @pytest.fixture(scope="module")

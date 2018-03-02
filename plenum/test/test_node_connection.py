@@ -10,7 +10,7 @@ from stp_core.common.log import getlogger
 from plenum.common.types import NodeDetail
 from plenum.test import waits
 from plenum.test.helper import stopNodes
-from plenum.test.test_node import TestNode, checkNodesConnected, \
+from plenum.test.test_node import TNode, checkNodesConnected, \
     ensureElectionsDone
 from stp_core.network.port_dispenser import genHa
 from plenum.common.config_helper import PNodeConfigHelper
@@ -52,10 +52,10 @@ def testNodesConnectsWhenOneNodeIsLate(allPluginsPath, tdir_for_func, tconf_for_
 
     def create(name):
         config_helper = PNodeConfigHelper(name, tconf_for_func, chroot=tdir_for_func)
-        node = TestNode(name, nodeReg,
-                        config_helper=config_helper,
-                        config=tconf_for_func,
-                        pluginPaths=allPluginsPath)
+        node = TNode(name, nodeReg,
+                     config_helper=config_helper,
+                     config=tconf_for_func,
+                     pluginPaths=allPluginsPath)
         nodes.append(node)
         return node
 
@@ -94,10 +94,10 @@ def testNodesConnectWhenTheyAllStartAtOnce(allPluginsPath, tdir_for_func, tconf_
 
     for name in nodeReg:
         config_helper = PNodeConfigHelper(name, tconf_for_func, chroot=tdir_for_func)
-        node = TestNode(name, nodeReg,
-                        config_helper=config_helper,
-                        config=tconf_for_func,
-                        pluginPaths=allPluginsPath)
+        node = TNode(name, nodeReg,
+                     config_helper=config_helper,
+                     config=tconf_for_func,
+                     pluginPaths=allPluginsPath)
         nodes.append(node)
 
     for node in nodes:
@@ -131,10 +131,10 @@ def testNodesComingUpAtDifferentTimes(allPluginsPath, tdir_for_func, tconf_for_f
 
     for name in names:
         config_helper = PNodeConfigHelper(name, tconf_for_func, chroot=tdir_for_func)
-        node = TestNode(name, nodeReg,
-                        config_helper=config_helper,
-                        config=tconf_for_func,
-                        pluginPaths=allPluginsPath)
+        node = TNode(name, nodeReg,
+                     config_helper=config_helper,
+                     config=tconf_for_func,
+                     pluginPaths=allPluginsPath)
         nodes.append(node)
 
     for node in nodes:
@@ -178,10 +178,10 @@ def testNodeConnection(allPluginsPath, tdir_for_func, tconf_for_func,
     nodes = []
     for name in names:
         config_helper = PNodeConfigHelper(name, tconf_for_func, chroot=tdir_for_func)
-        node = TestNode(name, nrg,
-                        config_helper=config_helper,
-                        config=tconf_for_func,
-                        pluginPaths=allPluginsPath)
+        node = TNode(name, nrg,
+                     config_helper=config_helper,
+                     config=tconf_for_func,
+                     pluginPaths=allPluginsPath)
         nodes.append(node)
 
     for node in nodes:
@@ -219,10 +219,10 @@ def testNodeRemoveUnknownRemote(allPluginsPath, tdir_for_func, tconf_for_func,
     nodes = []
     for name in names:
         config_helper = PNodeConfigHelper(name, tconf_for_func, chroot=tdir_for_func)
-        node = TestNode(name, nrg,
-                        config_helper=config_helper,
-                        config=tconf_for_func,
-                        pluginPaths=allPluginsPath)
+        node = TNode(name, nrg,
+                     config_helper=config_helper,
+                     config=tconf_for_func,
+                     pluginPaths=allPluginsPath)
         nodes.append(node)
 
     for node in nodes:
@@ -236,10 +236,10 @@ def testNodeRemoveUnknownRemote(allPluginsPath, tdir_for_func, tconf_for_func,
     name = "Gamma"
     initLocalKeys(tdir_for_func, tconf_for_func, {name: nodeReg[name]})
     config_helper = PNodeConfigHelper(name, tconf_for_func, chroot=tdir_for_func)
-    C = TestNode(name, {**nrg, **{name: nodeReg[name]}},
-                 config_helper=config_helper,
-                 config=tconf_for_func,
-                 pluginPaths=allPluginsPath)
+    C = TNode(name, {**nrg, **{name: nodeReg[name]}},
+              config_helper=config_helper,
+              config=tconf_for_func,
+              pluginPaths=allPluginsPath)
     for node in nodes:
         tellKeysToOthers(node, [C, ])
 

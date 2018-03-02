@@ -32,7 +32,7 @@ from plenum.test import waits
 from plenum.test.msgs import randomMsg
 from plenum.test.spy_helpers import getLastClientReqReceivedForNode, getAllArgs, getAllReturnVals
 from plenum.test.test_client import TestClient, genTestClient
-from plenum.test.test_node import TestNode, TestReplica, TestNodeSet, \
+from plenum.test.test_node import TNode, TestReplica, TestNodeSet, \
     checkNodesConnected, ensureElectionsDone, NodeRef, getPrimaryReplica
 from stp_core.common.log import getlogger
 from stp_core.loop.eventually import eventuallyAll, eventually
@@ -206,7 +206,7 @@ def getRepliesFromClientInbox(inbox, reqId) -> list:
                  [f.REQ_ID.nm] == reqId}.values())
 
 
-def checkLastClientReqForNode(node: TestNode, expectedRequest: Request):
+def checkLastClientReqForNode(node: TNode, expectedRequest: Request):
     recvRequest = getLastClientReqReceivedForNode(node)
     assert recvRequest
     assert expectedRequest.as_dict == recvRequest.as_dict
@@ -234,7 +234,7 @@ def assertEquality(observed: Any, expected: Any, details=None):
 
 def setupNodesAndClient(
         looper: Looper,
-        nodes: Sequence[TestNode],
+        nodes: Sequence[TNode],
         nodeReg=None,
         tmpdir=None):
     looper.run(checkNodesConnected(nodes))
@@ -243,7 +243,7 @@ def setupNodesAndClient(
 
 
 def setupClient(looper: Looper,
-                nodes: Sequence[TestNode] = None,
+                nodes: Sequence[TNode] = None,
                 nodeReg=None,
                 tmpdir=None,
                 identifier=None,
@@ -260,7 +260,7 @@ def setupClient(looper: Looper,
 
 def setupClients(count: int,
                  looper: Looper,
-                 nodes: Sequence[TestNode] = None,
+                 nodes: Sequence[TNode] = None,
                  nodeReg=None,
                  tmpdir=None):
     wallets = {}
@@ -434,20 +434,20 @@ def checkMessageReceived(msg, nodes, to, method: str = None):
 
 def addNodeBack(nodeSet: TestNodeSet,
                 looper: Looper,
-                nodeName: str) -> TestNode:
+                nodeName: str) -> TNode:
     node = nodeSet.addNode(nodeName)
     looper.add(node)
     return node
 
 
-def checkPropagateReqCountOfNode(node: TestNode, identifier: str, reqId: int):
+def checkPropagateReqCountOfNode(node: TNode, identifier: str, reqId: int):
     key = identifier, reqId
     assert key in node.requests
     assert node.quorums.propagate.is_reached(
         len(node.requests[key].propagates))
 
 
-def requestReturnedToNode(node: TestNode, identifier: str, reqId: int,
+def requestReturnedToNode(node: TNode, identifier: str, reqId: int,
                           instId: int):
     params = getAllArgs(node, node.processOrdered)
     # Skipping the view no and time from each ordered request
@@ -457,12 +457,12 @@ def requestReturnedToNode(node: TestNode, identifier: str, reqId: int,
     return expected in recvdOrderedReqs
 
 
-def checkRequestReturnedToNode(node: TestNode, identifier: str, reqId: int,
+def checkRequestReturnedToNode(node: TNode, identifier: str, reqId: int,
                                instId: int):
     assert requestReturnedToNode(node, identifier, reqId, instId)
 
 
-def checkRequestNotReturnedToNode(node: TestNode, identifier: str, reqId: int,
+def checkRequestNotReturnedToNode(node: TNode, identifier: str, reqId: int,
                                   instId: int):
     assert not requestReturnedToNode(node, identifier, reqId, instId)
 
@@ -623,7 +623,7 @@ def waitRejectFromPoolWithReason(looper, nodes, client, reason):
                              node.clientstack.name)
 
 
-def checkViewNoForNodes(nodes: Iterable[TestNode], expectedViewNo: int = None):
+def checkViewNoForNodes(nodes: Iterable[TNode], expectedViewNo: int = None):
     """
     Checks if all the given nodes have the expected view no
 
@@ -658,8 +658,8 @@ def waitForViewChange(looper, nodeSet, expectedViewNo=None,
                                  timeout=timeout))
 
 
-def getNodeSuspicions(node: TestNode, code: int = None):
-    params = getAllArgs(node, TestNode.reportSuspiciousNode)
+def getNodeSuspicions(node: TNode, code: int = None):
+    params = getAllArgs(node, TNode.reportSuspiciousNode)
     if params and code is not None:
         params = [param for param in params
                   if 'code' in param and param['code'] == code]
@@ -703,12 +703,12 @@ def filterNodeSet(nodeSet, exclude: List[Union[str, Node]]):
             [nodeSet[x] if isinstance(x, str) else x for x in exclude]]
 
 
-def whitelistNode(toWhitelist: str, frm: Sequence[TestNode], *codes):
+def whitelistNode(toWhitelist: str, frm: Sequence[TNode], *codes):
     for node in frm:
         node.whitelistNode(toWhitelist, *codes)
 
 
-def whitelistClient(toWhitelist: str, frm: Sequence[TestNode], *codes):
+def whitelistClient(toWhitelist: str, frm: Sequence[TNode], *codes):
     for node in frm:
         node.whitelistClient(toWhitelist, *codes)
 
@@ -796,7 +796,7 @@ def initDirWithGenesisTxns(
                 dirName, genesis_txn_file(new_domain_txn_file)))
 
 
-def stopNodes(nodes: List[TestNode], looper=None, ensurePortsFreedUp=True):
+def stopNodes(nodes: List[TNode], looper=None, ensurePortsFreedUp=True):
     if ensurePortsFreedUp:
         assert looper, 'Need a looper to make sure ports are freed up'
 

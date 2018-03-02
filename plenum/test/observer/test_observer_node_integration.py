@@ -4,12 +4,12 @@ from plenum.common.messages.node_messages import PrePrepare, Prepare, Commit
 from plenum.server.observer.observer_sync_policy import ObserverSyncPolicyType
 from plenum.test.helper import sdk_send_random_and_check
 from plenum.test.node_catchup.helper import checkNodeDataForEquality
-from plenum.test.test_node import TestNode
+from plenum.test.test_node import TNode
 
 
 @pytest.fixture(scope="module")
 def testNodeClass(patchPluginManager):
-    return TestNode
+    return TNode
 
 
 def exclude_from_consensus(node):

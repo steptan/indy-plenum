@@ -188,7 +188,7 @@ class TestNodeCore(StackedTester):
     def delayCheckPerformance(self, delay: Seconds):
         logger.debug("{} delaying check performance".format(self))
         delayerCheckPerf = partial(delayers.delayerMethod,
-                                   TestNode.checkPerformance)
+                                   TNode.checkPerformance)
         self.actionQueueStasher.delay(delayerCheckPerf(delay))
 
     def resetDelays(self, *names):
@@ -347,7 +347,7 @@ node_spyables = [Node.handleOneNodeMsg,
 
 
 @spyable(methods=node_spyables)
-class TestNode(TestNodeCore, Node):
+class TNode(TestNodeCore, Node):
     def __init__(self, *args, **kwargs):
         self.NodeStackClass = nodeStackClass
         self.ClientStackClass = clientStackClass
@@ -480,7 +480,7 @@ class TestNodeSet(ExitStack):
                  keyshare=True,
                  primaryDecider=None,
                  pluginPaths: Iterable[str]=None,
-                 testNodeClass=TestNode):
+                 testNodeClass=TNode):
 
         super().__init__()
         self.tmpdir = tmpdir
@@ -491,7 +491,7 @@ class TestNodeSet(ExitStack):
         self.pluginPaths = pluginPaths
 
         self.testNodeClass = testNodeClass
-        self.nodes = OrderedDict()  # type: Dict[str, TestNode]
+        self.nodes = OrderedDict()  # type: Dict[str, TNode]
         # Can use just self.nodes rather than maintaining a separate dictionary
         # but then have to pluck attributes from the `self.nodes` so keeping
         # it simple a the cost of extra memory and its test code so not a big
@@ -510,7 +510,7 @@ class TestNodeSet(ExitStack):
         # NodeSet. It's not a problem unless a node name shadows a member.
         self.__dict__.update(self.nodes)
 
-    def addNode(self, name: str) -> TestNode:
+    def addNode(self, name: str) -> TNode:
         if name in self.nodes:
             error("{} already added".format(name))
         assert name in self.nodeReg
@@ -552,10 +552,10 @@ class TestNodeSet(ExitStack):
         # for node in self:
         #     node.removeNodeFromRegistry(name)
 
-    def __iter__(self) -> Iterator[TestNode]:
+    def __iter__(self) -> Iterator[TNode]:
         return self.nodes.values().__iter__()
 
-    def __getitem__(self, key) -> Optional[TestNode]:
+    def __getitem__(self, key) -> Optional[TNode]:
         if key in self.nodes:
             return self.nodes[key]
         elif isinstance(key, int):
@@ -580,7 +580,7 @@ class TestNodeSet(ExitStack):
     def f(self):
         return getMaxFailures(len(self.nodes))
 
-    def getNode(self, node: NodeRef) -> TestNode:
+    def getNode(self, node: NodeRef) -> TNode:
         return node if isinstance(node, Node) \
             else self.nodes.get(node) if isinstance(node, str) \
             else error("Expected a node or node name")
@@ -673,7 +673,7 @@ class MockedBlacklister:
 
 
 def checkPoolReady(looper: Looper,
-                   nodes: Sequence[TestNode],
+                   nodes: Sequence[TNode],
                    customTimeout=None):
     """
     Check that pool is in Ready state
@@ -701,7 +701,7 @@ async def checkNodesCanRespondToClients(nodes):
     await eventually(x)
 
 
-async def checkNodesConnected(stacks: Iterable[Union[TestNode, TestClient]],
+async def checkNodesConnected(stacks: Iterable[Union[TNode, TestClient]],
                               expectedRemoteState=None,
                               customTimeout=None):
     expectedRemoteState = expectedRemoteState if expectedRemoteState else CONNECTED
@@ -720,7 +720,7 @@ async def checkNodesConnected(stacks: Iterable[Union[TestNode, TestClient]],
                         acceptableExceptions=[AssertionError, RemoteNotFound])
 
 
-def checkNodeRemotes(node: TestNode, states: Dict[str, RemoteState]=None,
+def checkNodeRemotes(node: TNode, states: Dict[str, RemoteState]=None,
                      state: RemoteState = None):
     assert states or state, "either state or states is required"
     assert not (
@@ -769,12 +769,12 @@ def checkIfSameReplicaIPrimary(looper: Looper,
                       retryWait=retryWait, totalTimeout=timeout))
 
 
-def checkNodesAreReady(nodes: Sequence[TestNode]):
+def checkNodesAreReady(nodes: Sequence[TNode]):
     for node in nodes:
         assert node.isReady(), '{} has status {}'.format(node, node.status)
 
 
-async def checkNodesParticipating(nodes: Sequence[TestNode], timeout: int=None):
+async def checkNodesParticipating(nodes: Sequence[TNode], timeout: int=None):
     # TODO is this used? If so - add timeout for it to plenum.test.waits
     if not timeout:
         timeout = .75 * len(nodes)
@@ -787,7 +787,7 @@ async def checkNodesParticipating(nodes: Sequence[TestNode], timeout: int=None):
 
 
 def checkEveryProtocolInstanceHasOnlyOnePrimary(looper: Looper,
-                                                nodes: Sequence[TestNode],
+                                                nodes: Sequence[TNode],
                                                 retryWait: float = None,
                                                 timeout: float = None,
                                                 numInstances: int = None):
@@ -805,7 +805,7 @@ def checkEveryProtocolInstanceHasOnlyOnePrimary(looper: Looper,
 
 
 def checkEveryNodeHasAtMostOnePrimary(looper: Looper,
-                                      nodes: Sequence[TestNode],
+                                      nodes: Sequence[TNode],
                                       retryWait: float = None,
                                       customTimeout: float = None):
     def checkAtMostOnePrim(node):
@@ -821,7 +821,7 @@ def checkEveryNodeHasAtMostOnePrimary(looper: Looper,
 
 
 def checkProtocolInstanceSetup(looper: Looper,
-                               nodes: Sequence[TestNode],
+                               nodes: Sequence[TNode],
                                retryWait: float = 1,
                                customTimeout: float = None,
                                numInstances: int = None):
@@ -847,10 +847,10 @@ def checkProtocolInstanceSetup(looper: Looper,
 
 
 def ensureElectionsDone(looper: Looper,
-                        nodes: Sequence[TestNode],
+                        nodes: Sequence[TNode],
                         retryWait: float = None,  # seconds
                         customTimeout: float = None,
-                        numInstances: int = None) -> Sequence[TestNode]:
+                        numInstances: int = None) -> Sequence[TNode]:
     # TODO: Change the name to something like `ensure_primaries_selected`
     # since there might not always be an election, there might be a round
     # robin selection
@@ -909,7 +909,7 @@ def prepareNodeSet(looper: Looper, nodeSet: TestNodeSet):
         nodeSet.removeNode(n, shouldClean=False)
 
 
-def checkViewChangeInitiatedForNode(node: TestNode, proposedViewNo: int):
+def checkViewChangeInitiatedForNode(node: TNode, proposedViewNo: int):
     """
     Check if view change initiated for a given node
     :param node: The node to check for
@@ -944,7 +944,7 @@ def getRequiredInstances(nodeCount: int) -> int:
     return f_value + 1
 
 
-def getPrimaryReplica(nodes: Sequence[TestNode],
+def getPrimaryReplica(nodes: Sequence[TNode],
                       instId: int = 0) -> TestReplica:
     preplicas = [node.replicas[instId] for node in nodes if
                  node.replicas[instId].isPrimary]
@@ -956,13 +956,13 @@ def getPrimaryReplica(nodes: Sequence[TestNode],
         return preplicas[0]
 
 
-def getNonPrimaryReplicas(nodes: Iterable[TestNode], instId: int = 0) -> \
+def getNonPrimaryReplicas(nodes: Iterable[TNode], instId: int = 0) -> \
         Sequence[TestReplica]:
     return [node.replicas[instId] for node in nodes if
             node.replicas[instId].isPrimary is False]
 
 
-def getAllReplicas(nodes: Iterable[TestNode], instId: int = 0) -> \
+def getAllReplicas(nodes: Iterable[TNode], instId: int = 0) -> \
         Sequence[TestReplica]:
     return [node.replicas[instId] for node in nodes]
 
@@ -997,7 +997,7 @@ def nodeByName(nodes, name):
     raise Exception("Node with the name '{}' has not been found.".format(name))
 
 
-def check_node_disconnected_from(needle: str, haystack: Iterable[TestNode]):
+def check_node_disconnected_from(needle: str, haystack: Iterable[TNode]):
     """
     Check if the node name given by `needle` is disconnected from nodes in
     `haystack`

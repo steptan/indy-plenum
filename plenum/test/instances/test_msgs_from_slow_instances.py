@@ -4,7 +4,7 @@ from stp_core.loop.eventually import eventually
 from plenum.common.messages.node_messages import Commit
 from plenum.server.replica import Replica
 from plenum.test.delayers import delayerMsgTuple
-from plenum.test.test_node import TestNode
+from plenum.test.test_node import TNode
 from plenum.test import waits
 
 
@@ -28,7 +28,7 @@ def configNodeSet(nodeSet):
 def testMsgFromInstanceDelay(configNodeSet, looper, prepared1):
     A, B, C, D = configNodeSet.nodes.values()
 
-    def getCommits(node: TestNode, instId: int):
+    def getCommits(node: TNode, instId: int):
         replica = node.replicas[instId]  # type: Replica
         return list(replica.commits.values())
 

@@ -10,7 +10,7 @@ from plenum.test.pool_transactions.helper import \
     disconnect_node_and_ensure_disconnected
 from plenum.test.node_catchup.helper import ensure_all_nodes_have_same_data
 from plenum.test.test_node import get_master_primary_node, ensureElectionsDone, \
-    TestNode, checkNodesConnected
+    TNode, checkNodesConnected
 from stp_core.common.log import getlogger
 from stp_core.loop.eventually import eventually
 from plenum.test import waits
@@ -26,11 +26,11 @@ def start_stopped_node(stopped_node, looper, tconf,
                          stopped_node.nodestack.ha), HA(*
                                                         stopped_node.clientstack.ha)
     config_helper = PNodeConfigHelper(stopped_node.name, tconf, chroot=tdir)
-    restarted_node = TestNode(stopped_node.name,
-                              config_helper=config_helper,
-                              config=tconf,
-                              ha=nodeHa, cliha=nodeCHa,
-                              pluginPaths=allPluginsPath)
+    restarted_node = TNode(stopped_node.name,
+                           config_helper=config_helper,
+                           config=tconf,
+                           ha=nodeHa, cliha=nodeCHa,
+                           pluginPaths=allPluginsPath)
     looper.add(restarted_node)
 
     # Even after reconnection INSTANCE_CHANGE messages are received,

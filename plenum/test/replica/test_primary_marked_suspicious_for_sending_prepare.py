@@ -7,7 +7,7 @@ from plenum.common.exceptions import SuspiciousNode
 from plenum.server.suspicion_codes import Suspicions
 from plenum.test.helper import getNodeSuspicions
 from plenum.test.spy_helpers import getAllArgs
-from plenum.test.test_node import TestNode, getNonPrimaryReplicas, \
+from plenum.test.test_node import TNode, getNonPrimaryReplicas, \
     getPrimaryReplica
 
 nodeCount = 7
@@ -40,7 +40,7 @@ def testPrimarySendsAPrepareAndMarkedSuspicious(looper, nodeSet, delay_commits,
 
     for node in nodeSet:
         if node in getNonPrimaryReplicas(nodeSet, 0):
-            frm, reason, code = getAllArgs(node, TestNode.reportSuspiciousNode)
+            frm, reason, code = getAllArgs(node, TNode.reportSuspiciousNode)
             assert frm == getPrimaryReplica(nodeSet, 0).node.name
             assert isinstance(reason, SuspiciousNode)
             assert len(getNodeSuspicions(node,

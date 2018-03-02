@@ -12,7 +12,7 @@ from stp_core.types import HA
 from plenum.test.helper import checkLedgerEquality, checkStateEquality, \
     check_seqno_db_equality, assertEquality, check_last_ordered_3pc
 from plenum.test.test_client import TestClient
-from plenum.test.test_node import TestNode
+from plenum.test.test_node import TNode
 from plenum.test import waits
 import pytest
 
@@ -22,8 +22,8 @@ logger = getlogger()
 
 # TODO: This should just take an arbitrary number of nodes and check for their
 #  ledgers to be equal
-def checkNodeDataForEquality(node: TestNode,
-                             *otherNodes: TestNode,
+def checkNodeDataForEquality(node: TNode,
+                             *otherNodes: TNode,
                              exclude_from_check=None):
 
     def chk_ledger_and_state(first_node, second_node, ledger_id):
@@ -49,8 +49,8 @@ def checkNodeDataForEquality(node: TestNode,
             chk_ledger_and_state(node, n, ledger_id)
 
 
-def checkNodeDataForInequality(node: TestNode,
-                               *otherNodes: TestNode,
+def checkNodeDataForInequality(node: TNode,
+                               *otherNodes: TNode,
                                exclude_from_check=None):
     # Checks for node's ledgers and state's to be unequal
     with pytest.raises(AssertionError):
@@ -58,8 +58,8 @@ def checkNodeDataForInequality(node: TestNode,
 
 
 def waitNodeDataEquality(looper,
-                         referenceNode: TestNode,
-                         *otherNodes: TestNode,
+                         referenceNode: TNode,
+                         *otherNodes: TNode,
                          customTimeout=None,
                          exclude_from_check=None):
     """
@@ -78,8 +78,8 @@ def waitNodeDataEquality(looper,
 
 
 def waitNodeDataInequality(looper,
-                           referenceNode: TestNode,
-                           *otherNodes: TestNode,
+                           referenceNode: TNode,
+                           *otherNodes: TNode,
                            exclude_from_check=None,
                            customTimeout=None):
     """
@@ -106,21 +106,21 @@ def ensure_all_nodes_have_same_data(looper, nodes, custom_timeout=None,
                          exclude_from_check=exclude_from_check)
 
 
-def ensureNewNodeConnectedClient(looper, client: TestClient, node: TestNode):
+def ensureNewNodeConnectedClient(looper, client: TestClient, node: TNode):
     stackParams = node.clientStackParams
     client.nodeReg[stackParams['name']] = HA('127.0.0.1', stackParams['ha'][1])
     looper.run(client.ensureConnectedToNodes())
 
 
 def checkClientPoolLedgerSameAsNodes(client: TestClient,
-                                     *nodes: TestNode):
+                                     *nodes: TNode):
     for n in nodes:
         checkLedgerEquality(client.ledger, n.poolLedger)
 
 
 def ensureClientConnectedToNodesAndPoolLedgerSame(looper,
                                                   client: TestClient,
-                                                  *nodes: TestNode):
+                                                  *nodes: TNode):
     looper.run(client.ensureConnectedToNodes())
     timeout = waits.expectedPoolGetReadyTimeout(len(nodes))
     looper.run(eventually(checkClientPoolLedgerSameAsNodes,

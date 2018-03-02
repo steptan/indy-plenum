@@ -1,23 +1,23 @@
 from plenum.common.messages.node_messages import Propagate
 from plenum.test.spy_helpers import getAllArgs
-from plenum.test.test_node import TestNode
+from plenum.test.test_node import TNode
 
 
-def sentPropagate(node: TestNode):
-    params = getAllArgs(node, TestNode.send)
+def sentPropagate(node: TNode):
+    params = getAllArgs(node, TNode.send)
     return [p for p in params if isinstance(p['msg'], Propagate)]
 
 
-def recvdPropagate(node: TestNode):
+def recvdPropagate(node: TNode):
     return getAllArgs(node,
-                      TestNode.processPropagate)
+                      TNode.processPropagate)
 
 
-def recvdRequest(node: TestNode):
+def recvdRequest(node: TNode):
     return getAllArgs(node,
-                      TestNode.processRequest)
+                      TNode.processRequest)
 
 
-def forwardedRequest(node: TestNode):
+def forwardedRequest(node: TNode):
     return getAllArgs(node,
-                      TestNode.forward)
+                      TNode.forward)

@@ -11,7 +11,7 @@ from plenum.test import waits
 from plenum.test.helper import waitForSufficientRepliesForRequests, \
     sendReqsToNodesAndVerifySuffReplies
 from plenum.test.test_client import genTestClient
-from plenum.test.test_node import TestNode, checkNodesConnected, \
+from plenum.test.test_node import TNode, checkNodesConnected, \
     ensureElectionsDone
 from stp_core.network.port_dispenser import genHa
 from plenum.common.config_helper import PNodeConfigHelper
@@ -59,10 +59,10 @@ def changeNodeHa(looper, txnPoolNodeSet, tdirWithClientPoolTxns,
 
     # start node with new HA
     config_helper = PNodeConfigHelper(subjectedNode.name, tconf, chroot=tdir)
-    restartedNode = TestNode(subjectedNode.name,
-                             config_helper=config_helper,
-                             config=tconf, ha=nodeStackNewHA,
-                             cliha=clientStackNewHA)
+    restartedNode = TNode(subjectedNode.name,
+                          config_helper=config_helper,
+                          config=tconf, ha=nodeStackNewHA,
+                          cliha=clientStackNewHA)
     looper.add(restartedNode)
     txnPoolNodeSet[nodeIndex] = restartedNode
     looper.run(checkNodesConnected(txnPoolNodeSet, customTimeout=70))

@@ -14,7 +14,7 @@ from plenum.common.util import randomString, hexToFriendly
 from plenum.test.helper import waitForSufficientRepliesForRequests, sdk_gen_request, sdk_sign_and_submit_req_obj, \
     sdk_get_reply
 from plenum.test.test_client import TestClient, genTestClient
-from plenum.test.test_node import TestNode, check_node_disconnected_from, \
+from plenum.test.test_node import TNode, check_node_disconnected_from, \
     ensure_node_disconnected, checkNodesConnected
 from stp_core.loop.eventually import eventually
 from stp_core.network.port_dispenser import genHa
@@ -106,9 +106,9 @@ def send_new_node_txn(sigseed,
 
 
 def addNewNode(looper, stewardClient, stewardWallet, newNodeName, tdir, tconf,
-               allPluginsPath=None, autoStart=True, nodeClass=TestNode,
+               allPluginsPath=None, autoStart=True, nodeClass=TNode,
                transformOpFunc=None, do_post_node_creation: Callable=None):
-    nodeClass = nodeClass or TestNode
+    nodeClass = nodeClass or TNode
     req, nodeIp, nodePort, clientIp, clientPort, sigseed \
         = sendAddNewNode(tdir, tconf, newNodeName, stewardClient, stewardWallet,
                          transformOpFunc)
@@ -133,9 +133,9 @@ def start_not_added_node(looper,
         prepare_new_node_data(tconf, tdir, newNodeName)
 
     new_node = create_and_start_new_node(looper, newNodeName,
-                                          tdir, randomString(32).encode(),
-                                          (nodeIp, nodePort), (clientIp, clientPort),
-                                          tconf, True, allPluginsPath, TestNode)
+                                         tdir, randomString(32).encode(),
+                                         (nodeIp, nodePort), (clientIp, clientPort),
+                                         tconf, True, allPluginsPath, TNode)
     return sigseed, bls_key, new_node
 
 
@@ -232,7 +232,7 @@ def addNewSteward(looper, client_tdir,
 
 def addNewStewardAndNode(looper, creatorClient, creatorWallet, stewardName,
                          newNodeName, tdir, client_tdir, tconf, allPluginsPath=None,
-                         autoStart=True, nodeClass=TestNode,
+                         autoStart=True, nodeClass=TNode,
                          clientClass=TestClient, transformNodeOpFunc=None,
                          do_post_node_creation: Callable=None):
     newSteward, newStewardWallet = addNewSteward(looper, client_tdir, creatorClient,
@@ -307,11 +307,11 @@ def updateNodeDataAndReconnect(looper, steward, stewardWallet, node,
     client_port = node_data.get(CLIENT_PORT, None) or node.clientstack.ha.port
     looper.removeProdable(name=node.name)
     config_helper = PNodeConfigHelper(node_alias, tconf, chroot=tdir)
-    restartedNode = TestNode(node_alias,
-                             config_helper=config_helper,
-                             config=tconf,
-                             ha=HA(node_ip, node_port),
-                             cliha=HA(client_ip, client_port))
+    restartedNode = TNode(node_alias,
+                          config_helper=config_helper,
+                          config=tconf,
+                          ha=HA(node_ip, node_port),
+                          cliha=HA(client_ip, client_port))
     looper.add(restartedNode)
 
     # replace node in txnPoolNodeSet
@@ -407,8 +407,8 @@ def new_client(looper, poolTxnClientData, txnPoolNodeSet, client_tdir):
 
 
 def disconnectPoolNode(poolNodes: Iterable,
-                       disconnect: Union[str, TestNode], stopNode=True):
-    if isinstance(disconnect, TestNode):
+                       disconnect: Union[str, TNode], stopNode=True):
+    if isinstance(disconnect, TNode):
         disconnect = disconnect.name
     assert isinstance(disconnect, str)
 
@@ -421,8 +421,8 @@ def disconnectPoolNode(poolNodes: Iterable,
 
 
 def reconnectPoolNode(poolNodes: Iterable,
-                      connect: Union[str, TestNode], looper):
-    if isinstance(connect, TestNode):
+                      connect: Union[str, TNode], looper):
+    if isinstance(connect, TNode):
         connect = connect.name
     assert isinstance(connect, str)
 
@@ -434,10 +434,10 @@ def reconnectPoolNode(poolNodes: Iterable,
 
 
 def disconnect_node_and_ensure_disconnected(looper, poolNodes,
-                                            disconnect: Union[str, TestNode],
+                                            disconnect: Union[str, TNode],
                                             timeout=None,
                                             stopNode=True):
-    if isinstance(disconnect, TestNode):
+    if isinstance(disconnect, TNode):
         disconnect = disconnect.name
     assert isinstance(disconnect, str)
     disconnectPoolNode(poolNodes, disconnect, stopNode=stopNode)
@@ -446,9 +446,9 @@ def disconnect_node_and_ensure_disconnected(looper, poolNodes,
 
 
 def reconnect_node_and_ensure_connected(looper, poolNodes,
-                                        connect: Union[str, TestNode],
+                                        connect: Union[str, TNode],
                                         timeout=None):
-    if isinstance(connect, TestNode):
+    if isinstance(connect, TNode):
         connect = connect.name
     assert isinstance(connect, str)
 

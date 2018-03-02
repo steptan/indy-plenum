@@ -10,7 +10,7 @@ from plenum.server.replica import Replica
 from plenum.test import waits
 from plenum.test.helper import chk_all_funcs
 from plenum.test.spy_helpers import getAllArgs
-from plenum.test.test_node import TestNode, getNonPrimaryReplicas, \
+from plenum.test.test_node import TNode, getNonPrimaryReplicas, \
     getAllReplicas, getPrimaryReplica
 
 
@@ -19,7 +19,7 @@ def checkPropagated(looper, nodeSet, request, faultyNodes=0):
     nodesSize = len(list(nodeSet.nodes))
 
     # noinspection PyIncorrectDocstring
-    def g(node: TestNode):
+    def g(node: TNode):
         """
         1. no of propagate received by node must be n -1 with zero
             faulty nodes in system; where n = num of nodes

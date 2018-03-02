@@ -16,7 +16,7 @@ from plenum.test.helper import setupNodesAndClient, \
     assertLength, addNodeBack, waitForSufficientRepliesForRequests, \
     getPendingRequestsForReplica, checkRequestReturnedToNode
 from plenum.test.profiler import profile_this
-from plenum.test.test_node import TestNode, TestNodeSet, checkPoolReady, \
+from plenum.test.test_node import TNode, TestNodeSet, checkPoolReady, \
     ensureElectionsDone, genNodeReg, prepareNodeSet
 
 whitelist = ['cannot process incoming PREPARE']
@@ -125,8 +125,8 @@ def testPrePrepareWhenPrimaryStatusIsUnknown(tdir_for_func):
                         timeout=delayD))  # wait little more than delay
 
 
-async def checkIfPropagateRecvdFromNode(recvrNode: TestNode,
-                                        senderNode: TestNode, identifier: str,
+async def checkIfPropagateRecvdFromNode(recvrNode: TNode,
+                                        senderNode: TNode, identifier: str,
                                         reqId: int):
     key = identifier, reqId
     assert key in recvrNode.requests

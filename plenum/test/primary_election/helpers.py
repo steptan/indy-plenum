@@ -1,9 +1,9 @@
 from plenum.common.messages.node_messages import Nomination, Primary
 from plenum.server.replica import Replica
-from plenum.test.test_node import TestNode
+from plenum.test.test_node import TNode
 
 
-def checkNomination(node: TestNode, nomineeName: str):
+def checkNomination(node: TNode, nomineeName: str):
     matches = [replica.name for instId, replica in enumerate(node.elector.replicas) if
                node.elector.didReplicaNominate(instId) is True and
                replica.name in node.elector.nominations[instId] and
@@ -14,7 +14,7 @@ def checkNomination(node: TestNode, nomineeName: str):
 
 
 # TODO Think of a better name for this function
-def getSelfNominationByNode(node: TestNode) -> int:
+def getSelfNominationByNode(node: TNode) -> int:
     """
     This function returns the index of the protocol instance for which it nominated itself
     @param node: the node
@@ -27,11 +27,11 @@ def getSelfNominationByNode(node: TestNode) -> int:
             return instId
 
 
-def nominationByNode(name: str, byNode: TestNode, instId: int):
+def nominationByNode(name: str, byNode: TNode, instId: int):
     return Nomination(name, instId, byNode.viewNo,
                       byNode.replicas[instId].lastOrderedPPSeqNo[1])
 
 
-def primaryByNode(name: str, byNode: TestNode, instId: int):
+def primaryByNode(name: str, byNode: TNode, instId: int):
     return Primary(name, instId, byNode.viewNo,
                    byNode.replicas[instId].lastOrderedPPSeqNo[1])

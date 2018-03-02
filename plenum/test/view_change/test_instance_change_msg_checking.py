@@ -3,7 +3,7 @@ import re
 from stp_core.loop.eventually import eventually
 from plenum.common.messages.node_messages import InstanceChange
 from plenum.test import waits
-from plenum.test.test_node import TestNode
+from plenum.test.test_node import TNode
 
 DISCARD_REASON = "validation error \[InstanceChange\]: expected types"
 
@@ -30,7 +30,7 @@ def testInstanceChangeMsgTypeChecking(nodeSet, looper, up):
     nodeA.send(icMsg, ridBeta)
     looper.runFor(0.2)
 
-    params = nodeB.spylog.getLastParams(TestNode.discard)
+    params = nodeB.spylog.getLastParams(TNode.discard)
 
     def chk():
         assert re.search(DISCARD_REASON, str(params['reason']))

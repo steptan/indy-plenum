@@ -1,5 +1,5 @@
-from plenum.test.test_node import TestNode
+from plenum.test.test_node import TNode
 
 
-def getProtocolInstanceNums(node: TestNode):
+def getProtocolInstanceNums(node: TNode):
     return [node.instances.masterId, *node.instances.backupIds]

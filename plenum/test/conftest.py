@@ -61,7 +61,7 @@ from plenum.test.node_request.node_request_helper import checkPrePrepared, \
     checkPropagated, checkPrepared, checkCommitted
 from plenum.test.plugin.helper import getPluginPath
 from plenum.test.test_client import genTestClient, TestClient
-from plenum.test.test_node import TestNode, TestNodeSet, Pool, \
+from plenum.test.test_node import TNode, TestNodeSet, Pool, \
     checkNodesConnected, ensureElectionsDone, genNodeReg
 from plenum.common.config_helper import PConfigHelper, PNodeConfigHelper
 
@@ -837,7 +837,7 @@ def poolTxnClient(tdirWithClientPoolTxns, txnPoolNodeSet):
 
 @pytest.fixture(scope="module")
 def testNodeClass(patchPluginManager):
-    return TestNode
+    return TNode
 
 
 @pytest.fixture(scope="module")
@@ -965,11 +965,11 @@ def testNode(pluginManager, tdir, tconf, node_config_helper_class):
     nodeReg = genNodeReg(names=[name])
     ha, cliname, cliha = nodeReg[name]
     config_helper = node_config_helper_class(name, tconf, chroot=tdir)
-    node = TestNode(name=name, ha=ha, cliname=cliname, cliha=cliha,
-                    nodeRegistry=copy(nodeReg),
-                    config_helper=config_helper,
-                    config=tconf,
-                    primaryDecider=None, pluginPaths=None, seed=randomSeed())
+    node = TNode(name=name, ha=ha, cliname=cliname, cliha=cliha,
+                 nodeRegistry=copy(nodeReg),
+                 config_helper=config_helper,
+                 config=tconf,
+                 primaryDecider=None, pluginPaths=None, seed=randomSeed())
     node.start(None)
     yield node
     node.stop()

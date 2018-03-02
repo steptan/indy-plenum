@@ -1,7 +1,7 @@
 from typing import Sequence, List
 
 from plenum.server.pool_manager import RegistryPoolManager, TxnPoolManager
-from plenum.test.test_node import TestNode, checkProtocolInstanceSetup
+from plenum.test.test_node import TNode, checkProtocolInstanceSetup
 
 
 def check_rank_consistent_across_each_node(nodes):
@@ -47,7 +47,7 @@ def check_newly_added_nodes(looper, all_nodes, new_nodes):
     checkProtocolInstanceSetup(looper, all_nodes, retryWait=1)
 
 
-def getPrimaryNodesIdxs(nodes: Sequence[TestNode]) -> List[TestNode]:
+def getPrimaryNodesIdxs(nodes: Sequence[TNode]) -> List[TNode]:
     primariesIdxs = []
     for instId in range(len(nodes[0].replicas)):
         for idx, node in enumerate(nodes):

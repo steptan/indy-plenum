@@ -6,7 +6,7 @@ from plenum.common.messages.node_messages import Propagate
 from plenum.test.delayers import delay, msg_rep_delay
 from plenum.test.propagate.helper import recvdRequest, recvdPropagate, \
     sentPropagate
-from plenum.test.test_node import TestNode
+from plenum.test.test_node import TNode
 
 nodeCount = 4
 howlong = 5
@@ -14,7 +14,7 @@ howlong = 5
 
 @pytest.fixture()
 def setup(nodeSet):
-    A, B, C, D = nodeSet.nodes.values()  # type: TestNode
+    A, B, C, D = nodeSet.nodes.values()  # type: TNode
     delay(Propagate, frm=[B, C, D], to=A, howlong=howlong)
     # Delay MessageRep by long simulating loss as if Propagate is missing, it
     # is requested
@@ -22,7 +22,7 @@ def setup(nodeSet):
 
 
 def testPropagateRecvdAfterRequest(setup, looper, nodeSet, up, sent1):
-    A, B, C, D = nodeSet.nodes.values()  # type: TestNode
+    A, B, C, D = nodeSet.nodes.values()  # type: TNode
 
     def x():
         # A should have received a request from the client

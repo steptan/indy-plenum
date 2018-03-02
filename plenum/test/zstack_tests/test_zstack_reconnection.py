@@ -7,7 +7,7 @@ from plenum.test.pool_transactions.conftest import looper, clientAndWallet1, \
     client1, wallet1, client1Connected
 from plenum.test.helper import sendReqsToNodesAndVerifySuffReplies, stopNodes, \
     send_reqs_to_nodes_and_verify_all_replies
-from plenum.test.test_node import TestNode, ensureElectionsDone
+from plenum.test.test_node import TNode, ensureElectionsDone
 from plenum.common.config_helper import PNodeConfigHelper
 
 logger = getlogger()
@@ -49,7 +49,7 @@ def testZStackNodeReconnection(tconf, looper, txnPoolNodeSet, client1, wallet1,
 
     looper.runFor(1)
     config_helper = PNodeConfigHelper(nodeToCrash.name, tconf, chroot=tdir)
-    node = TestNode(
+    node = TNode(
         nodeToCrash.name,
         config_helper=config_helper,
         config=tconf,

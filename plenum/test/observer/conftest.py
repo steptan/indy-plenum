@@ -7,7 +7,7 @@ from plenum.server.observer.observable import Observable
 from plenum.server.observer.observer_sync_policy import ObserverSyncPolicyType
 from plenum.test.bls.helper import generate_state_root
 from plenum.test.helper import sdk_random_request_objects
-from plenum.test.test_node import TestNode
+from plenum.test.test_node import TNode
 from plenum.test.testable import spyable
 
 from plenum.test.pool_transactions.conftest import looper
@@ -21,7 +21,7 @@ class TestObservable(Observable):
     pass
 
 
-class TestNodeWithObservable(TestNode):
+class TNodeWithObservable(TNode):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self._observable = TestObservable()
@@ -32,7 +32,7 @@ class TestNodeWithObservable(TestNode):
 
 @pytest.fixture(scope="module")
 def testNodeClass(patchPluginManager):
-    return TestNodeWithObservable
+    return TNodeWithObservable
 
 
 @pytest.fixture(scope="module")

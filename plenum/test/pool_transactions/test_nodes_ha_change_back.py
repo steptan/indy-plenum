@@ -1,6 +1,6 @@
 from plenum.common.constants import ALIAS, NODE_IP, NODE_PORT, CLIENT_IP, CLIENT_PORT
 from plenum.test.pool_transactions.helper import updateNodeData
-from plenum.test.test_node import TestNode, checkNodesConnected
+from plenum.test.test_node import TNode, checkNodesConnected
 from stp_core.network.port_dispenser import genHa
 from plenum.common.config_helper import PNodeConfigHelper
 
@@ -46,9 +46,9 @@ def testChangeNodeHaBack(looper, txnPoolNodeSet, tdir, tconf,
     # In order to save the time the pool connection is not maintaining
     # during the steps, only the final result is checked.
     config_helper = PNodeConfigHelper(theta.name, tconf, chroot=tdir)
-    restartedNode = TestNode(theta.name,
-                             config_helper=config_helper,
-                             config=tconf, ha=correctNodeHa, cliha=clientHa)
+    restartedNode = TNode(theta.name,
+                          config_helper=config_helper,
+                          config=tconf, ha=correctNodeHa, cliha=clientHa)
     looper.add(restartedNode)
     txnPoolNodeSet[-1] = restartedNode
 

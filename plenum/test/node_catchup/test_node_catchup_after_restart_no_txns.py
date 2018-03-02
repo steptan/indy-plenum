@@ -15,7 +15,7 @@ from plenum.test.node_catchup.helper import waitNodeDataEquality, \
 from plenum.test.pool_transactions.helper import \
     disconnect_node_and_ensure_disconnected
 from plenum.test.test_ledger_manager import TestLedgerManager
-from plenum.test.test_node import checkNodesConnected, TestNode
+from plenum.test.test_node import checkNodesConnected, TNode
 from plenum.test import waits
 from plenum.common.config_helper import PNodeConfigHelper
 
@@ -49,7 +49,7 @@ def test_node_catchup_after_restart_no_txns(
     logger.debug("Starting the stopped node, {}".format(new_node))
     nodeHa, nodeCHa = HA(*new_node.nodestack.ha), HA(*new_node.clientstack.ha)
     config_helper = PNodeConfigHelper(new_node.name, tconf, chroot=tdir)
-    new_node = TestNode(
+    new_node = TNode(
         new_node.name,
         config_helper=config_helper,
         config=tconf,

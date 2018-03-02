@@ -16,7 +16,7 @@ from plenum.common.request import Request
 from plenum.common.util import updateNamedTuple
 from stp_core.common.log import getlogger
 from plenum.server.replica import TPCStat
-from plenum.test.test_node import TestNode, TestReplica, getPrimaryReplica, \
+from plenum.test.test_node import TNode, TestReplica, getPrimaryReplica, \
     getNonPrimaryReplicas
 from plenum.test.delayers import ppDelay, cDelay
 
@@ -55,7 +55,7 @@ def delaysCommitProcessing(node, delay: float=30, instId: int=None):
 # Could have this method directly take a replica rather than a node and an
 # instance id but this looks more useful as a complete node can be malicious
 def sendDuplicate3PhaseMsg(
-        node: TestNode,
+        node: TNode,
         msgType: ThreePhaseMsg,
         count: int=2,
         instId=None):
@@ -118,7 +118,7 @@ def malign3PhaseSendingMethod(replica: TestReplica, msgType: ThreePhaseMsg,
         common.error.error("Not a 3 phase message")
 
 
-def malignInstancesOfNode(node: TestNode, malignMethod, instId: int=None):
+def malignInstancesOfNode(node: TNode, malignMethod, instId: int=None):
     if instId is not None:
         malignMethod(replica=node.replicas[instId])
     else:
@@ -128,7 +128,7 @@ def malignInstancesOfNode(node: TestNode, malignMethod, instId: int=None):
     return node
 
 
-def send3PhaseMsgWithIncorrectDigest(node: TestNode, msgType: ThreePhaseMsg,
+def send3PhaseMsgWithIncorrectDigest(node: TNode, msgType: ThreePhaseMsg,
                                      instId: int=None):
     def evilSendPrePrepareRequest(self, ppReq: PrePrepare):
         logger.debug("EVIL: Creating pre-prepare message for request : {}".

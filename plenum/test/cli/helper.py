@@ -21,7 +21,7 @@ from plenum.test.cli.test_keyring import createNewKeyring
 from plenum.test.helper import waitForSufficientRepliesForRequests
 from plenum.test.spy_helpers import getAllArgs
 from plenum.test.test_client import TestClient
-from plenum.test.test_node import TestNode, checkPoolReady
+from plenum.test.test_node import TNode, checkPoolReady
 from plenum.test.testable import spyable
 from pygments.token import Token
 from functools import partial
@@ -301,7 +301,7 @@ def checkRequest(cli, operation):
 
 def newCLI(looper, basedir, ledger_base_dir,
            cliClass=TestCli,
-           nodeClass=TestNode,
+           nodeClass=TNode,
            clientClass=TestClient,
            config=None,
            partition: str=None,

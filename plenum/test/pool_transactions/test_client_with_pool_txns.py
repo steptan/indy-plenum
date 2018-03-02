@@ -7,7 +7,7 @@ from plenum.test.helper import sendReqsToNodesAndVerifySuffReplies, \
 from plenum.test.node_catchup.helper import \
     ensureClientConnectedToNodesAndPoolLedgerSame
 from plenum.test.test_client import genTestClient
-from plenum.test.test_node import checkNodesConnected, TestNode, \
+from plenum.test.test_node import checkNodesConnected, TNode, \
     ensureElectionsDone
 from plenum.common.config_helper import PNodeConfigHelper
 
@@ -73,9 +73,9 @@ def testClientConnectToRestartedNodes(looper, txnPoolNodeSet, tdirWithPoolTxns,
     txnPoolNodeSet = []
     for nm in poolTxnNodeNames:
         config_helper = PNodeConfigHelper(nm, tconf, chroot=tdir)
-        node = TestNode(nm,
-                        config_helper=config_helper,
-                        config=tconf, pluginPaths=allPluginsPath)
+        node = TNode(nm,
+                     config_helper=config_helper,
+                     config=tconf, pluginPaths=allPluginsPath)
         looper.add(node)
         txnPoolNodeSet.append(node)
     looper.run(checkNodesConnected(txnPoolNodeSet))

@@ -175,7 +175,7 @@ def msg_rep_delay(delay: float, types_to_delay: List=None):
 
 
 def delay(what, frm, to, howlong):
-    from plenum.test.test_node import TestNode
+    from plenum.test.test_node import TNode
 
     if not isinstance(frm, Iterable):
         frm = [frm]
@@ -183,8 +183,8 @@ def delay(what, frm, to, howlong):
         to = [to]
     for f in frm:
         for t in to:
-            if isinstance(t, TestNode):
-                if isinstance(f, TestNode):
+            if isinstance(t, TNode):
+                if isinstance(f, TNode):
                     stasher = t.nodeIbStasher
                 elif isinstance(f, TestClient):
                     stasher = t.clientIbStasher

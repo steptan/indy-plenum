@@ -9,7 +9,7 @@ from plenum.test.helper import sendRandomRequests, \
     sendReqsToNodesAndVerifySuffReplies
 from plenum.test.node_catchup.helper import checkNodeDataForEquality
 from plenum.test.pool_transactions.helper import addNewStewardAndNode
-from plenum.test.test_node import TestNode
+from plenum.test.test_node import TNode
 from stp_core.loop.eventually import eventually
 
 
@@ -54,4 +54,4 @@ def testNewNodeCatchupWhileIncomingRequests(looper, txnPoolNodeSet,
     # TODO select or create a timeout for this case in 'waits'
     looper.run(eventually(checkNodeDataForEquality, newNode,
                           *txnPoolNodeSet[:-1], retryWait=1, timeout=80))
-    assert newNode.spylog.count(TestNode.processStashedOrderedReqs) > 0
+    assert newNode.spylog.count(TNode.processStashedOrderedReqs) > 0
