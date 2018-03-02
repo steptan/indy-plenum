@@ -398,3 +398,11 @@ class ObservedData(MessageBase):
         self._raise_invalid_fields(
             f.MSG.nm, msg,
             "The message type must be {} ".format(expected_type_cls.typename))
+
+
+class Gossip(MessageBase):
+    typename = 'gossip'
+    schema = (
+        ('msgs', IterableField(AnyValueField())),
+    )
+

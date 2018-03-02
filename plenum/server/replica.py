@@ -19,7 +19,8 @@ from plenum.common.hook_manager import HookManager
 from plenum.common.message_processor import MessageProcessor
 from plenum.common.messages.message_base import MessageBase
 from plenum.common.messages.node_messages import Reject, Ordered, \
-    PrePrepare, Prepare, Commit, Checkpoint, ThreePCState, CheckpointState, ThreePhaseMsg, ThreePhaseKey
+    PrePrepare, Prepare, Commit, Checkpoint, ThreePCState, CheckpointState, \
+    ThreePhaseMsg, ThreePhaseKey, Gossip
 from plenum.common.request import Request, ReqKey
 from plenum.common.types import f
 from plenum.common.util import updateNamedTuple, compare_3PC_keys, max_3PC_key, \
@@ -920,6 +921,8 @@ class Replica(HasActionQueue, MessageProcessor, HookManager):
                     report_suspicious(Suspicions.PPR_STATE_WRONG)
                 elif why_not_applied == PP_APPLY_ROOT_HASH_MISMATCH:
                     report_suspicious(Suspicions.PPR_TXN_WRONG)
+            else:
+                self.outBox.append(Gossip((pre_prepare, sender)))
         elif why_not == PP_CHECK_NOT_FROM_PRIMARY:
             report_suspicious(Suspicions.PPR_FRM_NON_PRIMARY)
         elif why_not == PP_CHECK_TO_PRIMARY:

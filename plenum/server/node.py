@@ -41,10 +41,11 @@ from plenum.common.message_processor import MessageProcessor
 from plenum.common.messages.node_message_factory import node_message_factory
 from plenum.common.messages.node_messages import Nomination, Batch, Reelection, \
     Primary, RequestAck, RequestNack, Reject, PoolLedgerTxns, Ordered, \
-    Propagate, PrePrepare, Prepare, Commit, Checkpoint, ThreePCState, Reply, InstanceChange, LedgerStatus, \
+    Propagate, PrePrepare, Prepare, Commit, Checkpoint, ThreePCState, Reply, \
+    InstanceChange, LedgerStatus, \
     ConsistencyProof, CatchupReq, CatchupRep, ViewChangeDone, \
     CurrentState, MessageReq, MessageRep, ThreePhaseType, BatchCommitted, \
-    ObservedData
+    ObservedData, Gossip
 from plenum.common.motor import Motor
 from plenum.common.plugin_helper import loadPlugins
 from plenum.common.request import Request, SafeRequest
@@ -66,6 +67,7 @@ from plenum.server.blacklister import SimpleBlacklister
 from plenum.server.client_authn import ClientAuthNr, SimpleAuthNr, CoreAuthNr
 from plenum.server.config_req_handler import ConfigReqHandler
 from plenum.server.domain_req_handler import DomainRequestHandler
+from plenum.server.gossiper import Gossipper
 from plenum.server.has_action_queue import HasActionQueue
 from plenum.server.instances import Instances
 from plenum.server.message_req_processor import MessageReqProcessor
@@ -105,7 +107,8 @@ logger = getlogger()
 
 
 class Node(HasActionQueue, Motor, Propagator, MessageProcessor, HasFileStorage,
-           HasPoolManager, PluginLoaderHelper, MessageReqProcessor, HookManager):
+           HasPoolManager, PluginLoaderHelper, MessageReqProcessor,
+           HookManager, Gossipper):
     """
     A node in a plenum system.
     """
@@ -410,6 +413,10 @@ class Node(HasActionQueue, Motor, Propagator, MessageProcessor, HasFileStorage,
 
         self._observable = Observable()
         self._observer = NodeObserver(self)
+
+        # Intiialise the gossiper, the node at this point knows how many
+        # nodes in total are in the network
+        Gossipper.__init__(self, [name for name in self.nodeReg if name != self.name])
 
     def init_config_ledger_and_req_handler(self):
         self.configLedger = self.getConfigLedger()
@@ -988,6 +995,7 @@ class Node(HasActionQueue, Motor, Propagator, MessageProcessor, HasFileStorage,
         if self.isGoing():
             self.nodestack.serviceLifecycle()
             self.clientstack.serviceClientStack()
+        self.gossip()
         return c
 
     async def serviceReplicas(self, limit) -> int:
@@ -1315,6 +1323,8 @@ class Node(HasActionQueue, Motor, Propagator, MessageProcessor, HasFileStorage,
         num_processed = 0
         for message in self.replicas.get_output(limit):
             num_processed += 1
+            if isinstance(message, Gossip):
+                self.queue_for_gossip(message)
             if isinstance(message, (PrePrepare, Prepare, Commit, Checkpoint)):
                 self.send(message)
             elif isinstance(message, Ordered):
