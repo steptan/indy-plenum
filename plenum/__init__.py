@@ -30,14 +30,15 @@ def setup_plugins():
 
     plugin_root = config.PLUGIN_ROOT
     try:
-        plugin_root = importlib.import_module(plugin_root)
+        plugin_root_path = importlib.import_module(plugin_root)
     except ImportError:
         raise ImportError('Incorrect plugin root {}. No such package found'.
                           format(plugin_root))
     enabled_plugins = config.ENABLED_PLUGINS
     for plugin_name in enabled_plugins:
-        plugin_path = os.path.join(plugin_root.__path__[0],
-                                   plugin_name, '__init__.py')
+        plugin_dir_path = os.path.abspath(plugin_root_path.__file__)
+        plugin_dir = os.path.dirname(plugin_dir_path)
+        plugin_path = os.path.join(plugin_dir, plugin_name, 'src', '__init__.py')
         spec = spec_from_file_location('__init__.py', plugin_path)
         init = module_from_spec(spec)
         spec.loader.exec_module(init)
